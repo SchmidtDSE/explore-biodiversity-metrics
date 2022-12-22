@@ -1,0 +1,18 @@
+
+
+
+Population data appears to be mostly (~ 90%) count data, not abundance estimates
+
+```{r}
+library(tidyverse)
+df <- read_csv("https://figshare.com/ndownloader/files/7012670")
+df |> count(Units, sort=TRUE)
+
+df |> mutate(abundance = grepl("[Aa]bundance", Units)) |> count(abundance)
+```
+
+
+Greatest number of species (rows) come from `{Sauer, 2012 #3261}`, which I think must be <https://doi.org/10.3996/nafa.79.0001>.
+This is actually abundance data (birds), though most other examples are all pure counts.
+Studies are supposed to control for sampling methodology, thus supposedly justifying the assumption on average that trends in counts are trends in abundance. 
+
