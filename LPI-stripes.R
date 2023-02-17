@@ -2,8 +2,10 @@
 library(rlpi)
 library(tidyverse)
 
-download.file("", "LPI2016.csv")
 df <- read_csv("https://figshare.com/ndownloader/files/7012670")
+
+
+
 df |> count(Method, sort=TRUE)
 
 
