@@ -9,7 +9,7 @@ output: html
 library(tidyverse)
 ```
 
-
+A quick look at the makeup of the LPI data
 
 ```{r}
 df <- read_csv("https://figshare.com/ndownloader/files/7012670")
@@ -28,38 +28,38 @@ lpi |> count(ID, sort=TRUE) |> pull(n) |> hist()
 lpi |> count(year,Class) |>
   ggplot(aes(year, n)) + geom_col(aes(fill=Class))
 ```
-```{r}
-#download.file("https://biotime.st-andrews.ac.uk/downloads/BioTIMEQuery_24_06_2021.zip", "biotime.zip")
-#archive::archive_extract("biotime.zip")
-#biotime <- read_csv("BioTIMEQuery_24_06_2021.csv")
-#biotime <- arrow::write_parquet(biotime, "biotime_2021.parquet")
 
-biotime <- arrow::open_dataset("biotime_2021.parquet")
+
+# BioTime
+
+```{r}
+download.file("https://biotime.st-andrews.ac.uk/downloads/BioTIMEQuery_24_06_2021.zip", "biotime.zip")
+archive::archive_extract("biotime.zip")
+biotime <- read_csv("BioTIMEQuery_24_06_2021.csv")
+
+# save RAM by using remote source
+#biotime <- arrow::write_parquet(biotime, "biotime_2021.parquet")
+#biotime <- arrow::open_dataset("biotime_2021.parquet")
 
 
 biotime |> count(YEAR, STUDY_ID) |> collect() |>
   ggplot(aes(YEAR, n)) + geom_col(aes(fill=STUDY_ID),position="stack") + scale_fill_viridis_c()
-
-s```
-
-```{r}
-sp <- biotime |> distinct(GENUS_SPECIES) |> pull(GENUS_SPECIES)
-library(taxadb)
-col <- taxadb::taxa_tbl("col")
-col_matches <- col |> filter(scientificName %in% sp) |> collect()
-biotime %>% distinct(GENUS, SPECIES)|> collect() -> x
-col_matches_sp <- col |> inner_join(x, copy=TRUE) |> collect()
-col_matches_sp
-biotime |> rename(genus=GENUS, specificEpithet=SPECIES) |> collect() |> left_join(col_matches_sp, copy=TRUE) |> count(YEAR, kingdom) |>  ggplot(aes(YEAR, n, fill=kingdom)) + geom_col()
 ```
 
+Note that species names are far from reliable and agreed-upon identifiers.  Taxonomy is hard - nearly half of the biotime species are not easily resolved against Catalog of Life names:
 
+```{r}
+library(taxadb)
+col <- taxadb::taxa_tbl("col")
+sp <- biotime |> distinct(GENUS_SPECIES) |> pull(GENUS_SPECIES)
+col_matches <- col |> filter(scientificName %in% sp) |> collect()
+```
 
+Just grabbing the first study listed in BioTIME, <https://doi.org/10.1890/0012-9658(2001)082[0893:WDWPDT]2.0.CO;2> to get a concrete example of what is going on. Here we find 25 species of trees measured at three time points over 12 years across 19 plots.  We see trends in abundance over this interval, but what conclusion should we draw from this?  The original paper seems to have a detailed understanding of these dynamics in response to windfall events and stand evolution...
 
 ```{r}
 trees <- biotime |> filter(STUDY_ID == 10) |> collect()
-trees <- trees |> mutate(control = grepl("Control", SAMPLE_DESC))
-trees |> count(PLOT)
+trees <- trees |> mutate(control = grepl("Control", SAMPLE_DESC)) # not really clear what makes a sample control or windfall, not a patch-level property
 
 trees |> group_by(GENUS_SPECIES, YEAR, control) |> summarise(count = sum(sum.allrawdata.ABUNDANCE), .groups="drop") |>
   ggplot(aes(YEAR, count, col=GENUS_SPECIES)) + geom_point() + geom_line() + scale_y_log10() + facet_wrap(~control)
