@@ -222,6 +222,19 @@
       "Hash": "f20c47fd52fae58b4e377c37bb8c335b",
       "Requirements": []
     },
+    "contentid": {
+      "Package": "contentid",
+      "Version": "0.0.16",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "3e66868d97265e68feab2628b37969d6",
+      "Requirements": [
+        "curl",
+        "fs",
+        "httr",
+        "openssl"
+      ]
+    },
     "cpp11": {
       "Package": "cpp11",
       "Version": "0.4.3",
@@ -324,6 +337,16 @@
         "tibble",
         "tidyselect",
         "vctrs"
+      ]
+    },
+    "duckdb": {
+      "Package": "duckdb",
+      "Version": "0.7.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "8264fad196681f46341f35e0d6753edb",
+      "Requirements": [
+        "DBI"
       ]
     },
     "ellipsis": {
@@ -1039,6 +1062,25 @@
       "Repository": "RSPM",
       "Hash": "34c16f1ef796057bfa06d3f4ff818a5d",
       "Requirements": []
+    },
+    "taxadb": {
+      "Package": "taxadb",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "e6405085e663f7c6c39cfe913813efff",
+      "Requirements": [
+        "DBI",
+        "contentid",
+        "dbplyr",
+        "dplyr",
+        "duckdb",
+        "magrittr",
+        "memoise",
+        "rlang",
+        "stringi",
+        "tibble"
+      ]
     },
     "tibble": {
       "Package": "tibble",
