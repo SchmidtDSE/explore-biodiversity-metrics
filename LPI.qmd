@@ -16,6 +16,7 @@ library(tidyverse)
 library(scales)
 ```
 
+Starting with the underlying living planet database, a collection of 'abundance' metrics from various studies across various taxa:
 
 ```{r}
 # Goodness people with the zip, csv.gz is a streamable format for the COMPRESS algo...
@@ -29,14 +30,17 @@ library(scales)
 # using cached version from above...
 lpd <- read_csv("data/lpd.csv.gz") |>
   pivot_longer(matches("\\d{4}"), names_to="year", values_to = "abundance_metric") |>
-  mutate(abundance_metric = as.numeric(abundance_metric)) |>
+  mutate(abundance_metric = as.numeric(abundance_metric),
+         year = as.numeric(year)) |>
   filter(!is.na(abundance_metric)) |>
   distinct()
 
 # counts are not really abundances but oh well...
 lpd |> count(Method, sort=TRUE)
 # biodiversity data is usually mostly bird data
-lpd |> count(Class, sort=TRUE)
+lpd |> count(year,Class) |>
+  ggplot(aes(year, n)) + geom_col(aes(fill=Class))
+
 
 # some 4016 distinct citations, though not all entirely distinct
 lpd |> count(Citation, sort=TRUE)

@@ -4,33 +4,21 @@ output: html
 
 
 
+```{r include=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+```
+
+
 
 ```{r}
 library(tidyverse)
 ```
 
-A quick look at the makeup of the LPI data
-
-```{r}
-df <- read_csv("https://figshare.com/ndownloader/files/7012670")
-lpi <- df |>
-  pivot_longer(matches("\\d{4}"),
-                       names_to="year",
-                       values_to="abundance") |>
-  mutate(abundance= as.numeric(abundance)) |>
-  filter(!is.na(abundance)) |>
-  mutate(year = as.integer(year))
-lpi
-
-# years of data in each study
-lpi |> count(ID, sort=TRUE) |> pull(n) |> hist()
-
-lpi |> count(year,Class) |>
-  ggplot(aes(year, n)) + geom_col(aes(fill=Class))
-```
 
 
 # BioTime
+
+BioTIME is at least somewhat more accesible
 
 ```{r}
 download.file("https://biotime.st-andrews.ac.uk/downloads/BioTIMEQuery_24_06_2021.zip", "biotime.zip")
@@ -46,6 +34,8 @@ biotime |> count(YEAR, STUDY_ID) |> collect() |>
   ggplot(aes(YEAR, n)) + geom_col(aes(fill=STUDY_ID),position="stack") + scale_fill_viridis_c()
 ```
 
+## Some random exploration
+
 Note that species names are far from reliable and agreed-upon identifiers.  Taxonomy is hard - nearly half of the biotime species are not easily resolved against Catalog of Life names:
 
 ```{r}
@@ -54,6 +44,8 @@ col <- taxadb::taxa_tbl("col")
 sp <- biotime |> distinct(GENUS_SPECIES) |> pull(GENUS_SPECIES)
 col_matches <- col |> filter(scientificName %in% sp) |> collect()
 ```
+
+## an example study wihtin BioTIME
 
 Just grabbing the first study listed in BioTIME, <https://doi.org/10.1890/0012-9658(2001)082[0893:WDWPDT]2.0.CO;2> to get a concrete example of what is going on. Here we find 25 species of trees measured at three time points over 12 years across 19 plots.  We see trends in abundance over this interval, but what conclusion should we draw from this?  The original paper seems to have a detailed understanding of these dynamics in response to windfall events and stand evolution...
 
