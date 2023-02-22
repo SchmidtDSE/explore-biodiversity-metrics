@@ -5,5 +5,5 @@
 *.zip
 *.html
 *_files
-
 /.quarto/
+explore-biodiversity-metrics.Rproj
